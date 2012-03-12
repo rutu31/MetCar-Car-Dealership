@@ -1,0 +1,211 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf250
+{\fonttbl\f0\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red0\green128\blue128;\red63\green127\blue127;\red128\green128\blue128;
+\red63\green127\blue95;\red63\green95\blue191;\red127\green0\blue127;\red42\green0\blue255;\red255\green0\blue0;
+\red102\green0\blue0;\red0\green130\blue0;\red0\green0\blue255;}
+\margl1440\margr1440\vieww22440\viewh13980\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\fs22 \cf0 \
+\pard\pardeftab720
+\cf2 <!\cf3 DOCTYPE\cf0  \cf2 html\cf0  \cf4 PUBLIC\cf0  \cf2 "-//W3C//DTD XHTML 1.0 Transitional//EN"\cf0  \
+ \cf5 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"\cf2 >\cf0 \
+ \
+\pard\pardeftab720
+\cf6 <!-- THIS FILE CREATES BILL FOR CUSTOMER. -->\cf0  \
+ \
+\pard\pardeftab720
+\cf2 <\cf3 html\cf0  \cf7 xmlns\cf0 =\cf8 "http://www.w3.org/1999/xhtml"\cf2 >\cf0 \
+\cf2 <\cf3 head\cf2 >\cf0 	\
+\cf2 <\cf3 title\cf2 >\cf0 MetCar Customer Bill\cf2 </\cf3 title\cf2 >\cf0 \
+	\cf2 <\cf3 link\cf0  \cf7 rel\cf0 =\cf8 "stylesheet"\cf0  \cf7 type\cf0 =\cf8 "text/css"\cf0  \cf7 href\cf0 =\cf8 "MetCarCSS.css"\cf0  \cf2 />\cf0 \
+\cf2 </\cf3 head\cf2 >\cf0 \
+\
+\cf2 <\cf3 body\cf2 >\cf0 \
+	\cf2 <\cf3 div\cf0  \cf7 class\cf0 =\cf8 "main_menu_link"\cf2 >\cf0 \
+		\cf2 <\cf3 a\cf0  \cf7 href\cf0 =\cf8 "MetCarHome.html"\cf2 >\cf0 Main menu\cf2 </\cf3 a\cf2 >\cf0 \
+	\cf2 </\cf3 div\cf2 >\cf0 \
+\
+\pard\pardeftab720
+\cf9 <?php\cf0  \
+		\cf4 // CREATE DATABASE CONNECTION\cf0 \
+\
+		\cf10 $db_conn \cf0 = @mysql_connect(\cf11 "localhost"\cf0 , \cf11 "root"\cf0 , \cf11 ""\cf0 );\
+		\cf12 if\cf0 (! \cf10 $db_conn\cf0 ) \{\
+			\cf12 echo \cf0 (\cf11 "Unable to connect to database."\cf0 );\
+			\cf12 exit\cf0 ();\
+		\}\
+		\
+		\cf10 $db \cf0 = @mysql_select_db(\cf11 "MetCar"\cf0 ,\cf10 $db_conn\cf0 );\
+		\cf12 if\cf0 (!\cf10 $db\cf0 ) \{\
+			\cf12 echo \cf0 (\cf11 "Unable to open tootie database"\cf0 );\
+			\cf12 exit\cf0 ();\
+		\}\
+\
+		\cf10 $billPhone \cf0 = \cf10 $_POST\cf0 [\cf11 'bill_Phone'\cf0 ];\
+		\cf10 $carModel \cf0 = \cf10 $_POST\cf0 [\cf11 'car_model'\cf0 ];\
+		\
+		\cf4 // FORM VALIDATIONS\cf0 \
+		\
+		\cf12 if\cf0 (\cf12 empty\cf0 (\cf10 $billPhone\cf0 ) || \cf12 empty\cf0 (\cf10 $carModel\cf0 ))\{\
+			\cf12 echo \cf11 "<script language=javascript>alert('All the fields are required ! Please re-enter')</script>"\cf0 ;\
+			\cf12 echo \cf11 "<a href='MetCarExistingCustomer.php'>Go Back</a>"\cf0 ;\
+			\cf12 exit\cf0 (\cf9 0\cf0 );\
+		\}\
+		\
+		\cf4 // RETRIEVE CUSTOMER INFO\cf0 \
+		\
+		\cf10 $sql \cf0 = \cf11 "select * from customer where day_phone = '"\cf0 .\cf10 $billPhone\cf0 .\cf11 "'"\cf0 ;\
+		\cf10 $result \cf0 = mysql_query(\cf10 $sql\cf0 );\
+		\cf10 $row \cf0 = mysql_fetch_array(\cf10 $result\cf0 );\
+		\
+		\cf10 $flag1 \cf0 = \cf9 0\cf0 ;\
+		\cf12 if\cf0 (\cf10 $row\cf0 )\{\
+			\cf4 //echo 'inside1';\cf0 \
+			\cf10 $custId \cf0 = \cf10 $row\cf0 [\cf11 'cust_id'\cf0 ];\
+\
+			\cf4 // CHECK FOR CAR MODEL FOR THE CUSTOMER\cf0 \
+			\
+			\cf10 $sql1 \cf0 = \cf11 "select * from car where cust_id = "\cf0 .\cf10 $custId\cf0 ;\
+			\cf10 $result1 \cf0 = mysql_query(\cf10 $sql1\cf0 );\
+			\cf12 while\cf0 (\cf10 $row1 \cf0 = mysql_fetch_array(\cf10 $result1\cf0 ))\{\
+				\cf12 if\cf0 (\cf10 $row1\cf0 [\cf11 'car_model'\cf0 ] == \cf10 $carModel\cf0 )\{\
+					\cf4 // ENTERED CAR MODEL IS CORRECT\cf0 \
+					\cf10 $flag1 \cf0 = \cf9 1\cf0 ;\
+				\}\
+			\}\
+\
+			\cf4 // CAR MODEL IN INCORRECT I.E. CUSTOMER DOESN'T HAVE A CAR OF ENTERED MODEL\cf0 \
+\
+			\cf12 if\cf0 (!\cf10 $flag1\cf0 )\{\
+				\cf12 echo \cf11 "<script language=javascript>alert('Please re-enter car model')</script>"\cf0 ;\
+				\cf12 echo \cf11 "<a href='MetCarExistingCustomer.php'>Go Back</a>"\cf0 ;\
+				\cf12 exit\cf0 (\cf9 0\cf0 );		\
+			\}						\
+		\}\
+		\
+		\cf4 // CUSTOMER DOESN'T EXIST IN THE DATABASE \cf0 \
+		\cf12 else if\cf0 (!\cf10 $row\cf0 )\{\
+			\cf12 echo \cf11 "<script language=javascript>alert('No such customer exsist. Enter Again')</script>"\cf0 ;\
+			\cf12 echo \cf11 "<a href='MetCarExistingCustomer.php'>Go Back</a>"\cf0 ;\
+			\cf12 exit\cf0 (\cf9 0\cf0 );\
+		\}\
+		\
+		\cf9 ?>\cf0 \
+		\
+		\cf6 <!-- DISPLAY CUSTOMER BILL -->\cf0 \
+		\
+		\cf2 <\cf3 div\cf0  \cf7 class\cf0 =\cf8 "customer_bill"\cf2 >\cf0 \
+		\cf2 <\cf3 fieldset\cf2 ><\cf3 legend\cf2 ><\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color: white"\cf2 >\cf0 CUSTOMER BILL\cf2 </\cf3 span\cf2 ></\cf3 legend\cf2 >\cf0 \
+			\
+			\cf6 <!-- DISPLAY CUSTOMER INFO -->\cf0 \
+			\
+			\cf2 <\cf3 fieldset\cf2 ><\cf3 legend\cf2 ><\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color: white"\cf2 >\cf0 Customer Info\cf2 </\cf3 span\cf2 ></\cf3 legend\cf2 >\cf0 \
+				\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 Customer Name: \cf2 </\cf3 span\cf2 >\cf9 <?php\cf0  \cf12 echo \cf10 $row\cf0 [\cf11 'first_name'\cf0 ]; \cf12 echo\cf11 ' '\cf0 ;\cf12 echo \cf10 $row\cf0 [\cf11 'last_name'\cf0 ];\cf9 ?>\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+				\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 Address: \cf2 </\cf3 span\cf2 >\cf9 <?php\cf0  \cf12 echo \cf10 $row\cf0 [\cf11 'street'\cf0 ]; \cf12 echo \cf11 ', '\cf0 ; \cf12 echo \cf10 $row\cf0 [\cf11 'city'\cf0 ]; \cf12 echo \cf11 ' '\cf0 ; \cf12 echo \cf10 $row\cf0 [\cf11 'zip'\cf0 ];\cf9 ?>\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+				\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 Phone Number: \cf2 </\cf3 span\cf2 ><\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0  \cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf8 &nbsp;&nbsp;&nbsp;\cf0 Day Phone :\cf2 </\cf3 span\cf2 >\cf0  \cf9 <?php\cf0  \cf12 echo \cf10 $row\cf0 [\cf11 'day_phone'\cf0 ];\cf9 ?>\cf0  \cf8 &nbsp;\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 Work Phone :\cf2 </\cf3 span\cf2 >\cf0  \cf9 <?php\cf0  \cf12 echo \cf10 $row\cf0 [\cf11 'work_phone'\cf0 ];\cf9 ?>\cf0  \
+			\cf2 </\cf3 fieldset\cf2 >\cf0 \
+			\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+		\cf9 <?php\cf0 \
+		\
+		\cf10 $custId \cf0 = \cf10 $row\cf0 [\cf11 'cust_id'\cf0 ];\
+		\
+		\cf10 $sql \cf0 = \cf11 "select * from car where cust_id = "\cf0 .\cf10 $custId\cf0 .\cf11 " and car_model = '"\cf0 .\cf10 $carModel\cf0 .\cf11 "'"\cf0 ;\
+		\cf10 $result \cf0 = mysql_query(\cf10 $sql\cf0 );\
+		\cf10 $row \cf0 = mysql_fetch_array(\cf10 $result\cf0 )\cf9 ?>\cf0 \
+		\
+		\cf6 <!-- DISPLAY CAR INFO -->\cf0 \
+		\
+		\cf2 <\cf3 fieldset\cf2 ><\cf3 legend\cf2 ><\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color: white"\cf2 >\cf0 Car Info\cf2 </\cf3 span\cf2 ></\cf3 legend\cf2 >\cf0 \
+			\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 Car Licence Number:\cf2 </\cf3 span\cf2 >\cf0  \cf9 <?php\cf0  \cf12 echo \cf10 $row\cf0 [\cf11 'licence_no'\cf0 ];\cf9 ?>\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+			\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 Car Model:\cf2 </\cf3 span\cf2 >\cf0  \cf9 <?php\cf0  \cf12 echo \cf10 $row\cf0 [\cf11 'car_model'\cf0 ];\cf9 ?>\cf0 			\
+		\cf2 </\cf3 fieldset\cf2 >\cf0 \
+		\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+		\
+		\cf6 <!-- DISPLAY BILL DETAILS -->\cf0 \
+		\
+		\cf2 <\cf3 fieldset\cf2 ><\cf3 legend\cf2 ><\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color: white"\cf2 >\cf0 Bill Details\cf2 </\cf3 span\cf2 ></\cf3 legend\cf2 >\cf0 \
+		\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color: white"\cf2 >\cf0 Repair Problems \cf2 </\cf3 span\cf2 ><\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+		\cf9 <?php\cf0   \
+		\
+		\cf10 $licence \cf0 = \cf10 $row\cf0 [\cf11 'licence_no'\cf0 ];\
+		\
+		\cf4 // DISPLAY PROBLEMS REPAIRED & ITS DETAILS \cf0 \
+		\
+		\cf10 $sql \cf0 = \cf11 "select * from repair_job where car_licence = '"\cf0 .\cf10 $licence\cf0 .\cf11 "'"\cf0 ;\
+		\cf10 $result \cf0 = mysql_query(\cf10 $sql\cf0 );\
+		\cf10 $row \cf0 = mysql_fetch_array(\cf10 $result\cf0 );\
+		\
+		\cf10 $repairJobId \cf0 = \cf10 $row\cf0 [\cf11 'job_id'\cf0 ];\
+		\cf10 $repairCost \cf0 = \cf10 $row\cf0 [\cf11 'total_repair_charges'\cf0 ];\
+		\cf10 $serviceFee \cf0 = \cf10 $row\cf0 [\cf11 'service_fee'\cf0 ];\
+		\
+		\cf10 $cnt \cf0 = \cf9 0\cf0 ;\
+		\cf10 $flag \cf0 = \cf9 0\cf0 ;\
+		\cf10 $sql \cf0 = \cf11 "select * from repair_problem where problem_id in (select problem_id from repair where job_id = "\cf0 .\cf10 $repairJobId\cf0 .\cf11 " )"\cf0 ;\
+		\cf10 $result \cf0 = mysql_query(\cf10 $sql\cf0 );\cf9 ?>\cf0 \
+				\
+		\cf9 <?php\cf0  \
+		\cf12 while\cf0 (\cf10 $row \cf0 = mysql_fetch_array(\cf10 $result\cf0 ))\{\
+			\cf10 $cnt\cf0 ++;\
+			\cf10 $repairProblemId \cf0 = \cf10 $row\cf0 [\cf11 'problem_id'\cf0 ];\
+			\
+			\cf4 // CHECK IF CAR HAD TRANSMISSION PROBLEM\cf0 \
+			\
+			\cf12 if\cf0 (\cf10 $row\cf0 [\cf11 'problem_type'\cf0 ] == \cf11 "Transmission"\cf0 )\{\
+				\cf10 $flag \cf0 = \cf9 1\cf0 ;\
+			\}\
+			\
+			\cf12 echo \cf11 '<span style="color: white">'\cf0 ; \cf12 echo \cf10 $cnt\cf0 ; \cf12 echo \cf11 '. '\cf0 ; \cf12 echo \cf10 $row\cf0 [\cf11 'problem_type'\cf0 ]; \cf12 echo \cf11 ' </span><br /> &nbsp; Labor Cost: $ '\cf0 ; \cf12 echo \cf10 $row\cf0 [\cf11 'labor_cost'\cf0 ]; \
+		\cf9 ?>\cf0  \cf2 <\cf3 br\cf0  \cf2 />\cf0 			\
+		\cf9 <?php\cf0 \
+			\cf10 $sql1 \cf0 = \cf11 "select * from part where part_id in (select part_id from requires where problem_id = "\cf0 .\cf10 $repairProblemId\cf0 .\cf11 " )"\cf0 ;\
+			\cf10 $result1 \cf0 = mysql_query(\cf10 $sql1\cf0 );	\
+			\cf10 $row1 \cf0 = mysql_fetch_array(\cf10 $result1\cf0 );\
+		\cf9 ?>\cf0  \
+			\cf8 &nbsp;\cf0 \
+			Part Changed: \cf9 <?php\cf0  \cf12 echo \cf10 $row1\cf0 [\cf11 'part_name'\cf0 ];\cf9 ?>\cf0  \cf8 &nbsp;\cf2 <\cf3 br\cf0  \cf2 />\cf8 &nbsp;\cf0 \
+			Cost of Part: $ \cf9 <?php\cf0   \cf12 echo \cf10 $row1\cf0 [\cf11 'part_cost'\cf0 ];\cf9 ?>\cf0 \
+			\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+		\cf9 <?php\cf0  \}\
+\
+		\cf9 ?>\cf0 \
+		\cf6 <!-- DISPLAY MONEY DETAILS -->\cf0 \
+		\
+			\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+			\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 Total Repair Cost: \cf2 </\cf3 span\cf2 >\cf0  $ \cf9 <?php\cf0  \cf12 echo \cf10 $repairCost\cf0 ;\cf9 ?>\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+			\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 + Service Fee: \cf2 </\cf3 span\cf2 >\cf0  $ \cf9 <?php\cf0  \cf12 echo \cf10 $serviceFee\cf0 ;\cf9 ?>\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+			\cf9 <?php\cf0  \cf10 $BILL \cf0 = \cf10 $repairCost \cf0 + \cf10 $serviceFee\cf0 ;\cf9 ?>\cf0 \
+			\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 = Total Repair Charges: \cf2 </\cf3 span\cf2 >\cf0  $ \cf9 <?php\cf0  \cf12 echo \cf10 $BILL\cf0 ;\cf9 ?>\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+			\
+		\cf9 <?php\cf0  \
+			\
+		\cf4 // CALCULATE DISCOUNT IF CAR HAS SERVICE CONTRACT AND IT HAD TRANSMISSION PROBLEM\cf0 \
+			\
+			\cf10 $sql \cf0 = \cf11 "select * from service_contract where car_licence = '"\cf0 .\cf10 $licence\cf0 .\cf11 "' and end_date > CURDATE()"\cf0 ;\
+			\cf10 $result \cf0 = mysql_query(\cf10 $sql\cf0 );\
+			\cf10 $row \cf0 = mysql_fetch_array(\cf10 $result\cf0 );\
+\
+			\cf12 if\cf0 (\cf10 $row \cf0 && \cf10 $flag\cf0 )\{\cf9 ?>\cf0 			\
+					\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white"\cf2 >\cf0 - Service Contract Discount: \cf2 </\cf3 span\cf2 >\cf0  20%\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+					\cf9 <?php\cf0  \cf10 $BILL \cf0 -= \cf10 $BILL \cf0 / \cf9 5\cf0 ;\cf9 ?>\cf0 			\
+	  \cf9 <?php\cf0  \}\
+			\
+		\cf9 ?>\cf0 			\
+		\
+		\cf6 <!-- DISPLAY TOTAL BILL AMOUNT -->\cf0 \
+		\cf2 <\cf3 div\cf0  \cf7 class\cf0 =\cf8 "final_bill_display"\cf2 >\cf0 \
+			\cf2 <\cf3 span\cf0  \cf7 style\cf0 =\cf8 "color:white; font-size: 20px"\cf2 >\cf0 TOTAL BILL: \cf2 </\cf3 span\cf2 >\cf0  $ \cf9 <?php\cf0  \cf12 echo \cf10 $BILL\cf0 ;\cf9 ?>\cf0 \
+		\cf2 </\cf3 div\cf2 >\cf0 	\
+		\cf2 </\cf3 fieldset\cf2 >\cf0 \
+		\
+		\cf2 </\cf3 fieldset\cf2 >\cf0 \
+		\cf2 </\cf3 div\cf2 >\cf0 \
+		\cf2 <\cf3 br\cf0  \cf2 /><\cf3 br\cf0  \cf2 />\cf0 \
+\
+	\cf9 <?php\cf0  mysql_close(\cf10 $db_conn\cf0 );\cf9 ?>\cf0 \
+	\
+\pard\pardeftab720
+\cf2 </\cf3 body\cf2 >\cf0 \
+\cf2 </\cf3 html\cf2 >\cf0 \
+}
